@@ -3,13 +3,13 @@ import type { SavingsProduct } from '../types';
 
 interface SavingsProductsListProps {
   savingsProducts: SavingsProduct[];
-  selectedProduct?: SavingsProduct | null;
+  selectedProductId: string | null;
   onClickProduct?: (product: SavingsProduct) => void;
 }
 
 export default function SavingsProductsList({
   savingsProducts,
-  selectedProduct,
+  selectedProductId,
   onClickProduct,
 }: SavingsProductsListProps) {
   return (
@@ -29,7 +29,7 @@ export default function SavingsProductsList({
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
-            right={selectedProduct === product && <Assets.Icon name="icon-check-circle-green" />}
+            right={selectedProductId === product.id && <Assets.Icon name="icon-check-circle-green" />}
             onClick={onClickProduct ? () => onClickProduct(product) : undefined}
           />
         ))

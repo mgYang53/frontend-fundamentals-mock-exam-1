@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { SavingsCalculatorContent } from './components';
 import { extractDigits, formatAmount } from './utils';
-import type { PageTabValues, SavingsProduct } from './types';
+import type { PageTabValues } from './types';
 
 export default function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<string>('');
   const [monthlyAmount, setMonthlyAmount] = useState<string>('');
   const [savingsTerms, setSavingsTerms] = useState<number>(6);
 
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<PageTabValues>('products');
 
   return (
@@ -62,8 +62,8 @@ export default function SavingsCalculatorPage() {
         targetAmount={targetAmount}
         monthlyAmount={monthlyAmount}
         savingsTerms={savingsTerms}
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
+        selectedProductId={selectedProductId}
+        setSelectedProductId={setSelectedProductId}
         selectedTab={selectedTab}
       />
     </>

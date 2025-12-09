@@ -1,6 +1,6 @@
 import { Border, ListRow, Spacing } from 'tosslib';
 import { useSavingsProducts, useFilteredProducts } from '../hooks';
-import type { PageTabValues, SavingsProduct } from '../types';
+import type { PageTabValues } from '../types';
 import SavingsProductsList from './SavingsProductsList';
 import CalculationResult from './CalculationResult';
 import RecommendedProductsList from './RecommendedProductsList';
@@ -9,8 +9,8 @@ interface SavingsCalculatorContentProps {
   targetAmount: string;
   monthlyAmount: string;
   savingsTerms: number;
-  selectedProduct: SavingsProduct | null;
-  setSelectedProduct: (product: SavingsProduct) => void;
+  selectedProductId: string | null;
+  setSelectedProductId: (productId: string) => void;
   selectedTab: PageTabValues;
 }
 
@@ -18,12 +18,14 @@ export default function SavingsCalculatorContent({
   targetAmount,
   monthlyAmount,
   savingsTerms,
-  selectedProduct,
-  setSelectedProduct,
+  selectedProductId,
+  setSelectedProductId,
   selectedTab,
 }: SavingsCalculatorContentProps) {
   const { products: savingsProducts, loading, error } = useSavingsProducts();
   const displayedProducts = useFilteredProducts(savingsProducts, monthlyAmount, savingsTerms);
+
+  const selectedProduct = savingsProducts.find(product => product.id === selectedProductId);
 
   if (loading) {
     return <div css={{ padding: '16px', textAlign: 'center' }}>로딩 중...</div>;
@@ -39,8 +41,8 @@ export default function SavingsCalculatorContent({
       {selectedTab === 'products' && (
         <SavingsProductsList
           savingsProducts={displayedProducts}
-          selectedProduct={selectedProduct}
-          onClickProduct={setSelectedProduct}
+          selectedProductId={selectedProductId}
+          onClickProduct={product => setSelectedProductId(product.id)}
         />
       )}
 
@@ -64,7 +66,7 @@ export default function SavingsCalculatorContent({
           <Border height={16} />
           <Spacing size={8} />
 
-          <RecommendedProductsList displayedProducts={displayedProducts} />
+          <RecommendedProductsList displayedProducts={displayedProducts} selectedProductId={selectedProductId} />
 
           <Spacing size={40} />
         </>
