@@ -7,7 +7,10 @@ interface RecommendedProductsListProps {
   selectedProductId: string | null;
 }
 
-export default function RecommendedProductsList({ displayedProducts, selectedProductId }: RecommendedProductsListProps) {
+export default function RecommendedProductsList({
+  displayedProducts,
+  selectedProductId,
+}: RecommendedProductsListProps) {
   const recommendedProducts = [...displayedProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (

@@ -1,27 +1,35 @@
+import { useState } from 'react';
 import { Border, ListRow, Spacing } from 'tosslib';
 import { useSavingsProducts, useFilteredProducts } from '../hooks';
-import type { PageTabValues } from '../types';
 import SavingsProductsList from './SavingsProductsList';
 import CalculationResult from './CalculationResult';
 import RecommendedProductsList from './RecommendedProductsList';
+import type { PageTabValues } from '../SavingsCalculatorPage';
 
 interface SavingsCalculatorContentProps {
   targetAmount: string;
   monthlyAmount: string;
   savingsTerms: number;
-  selectedProductId: string | null;
-  setSelectedProductId: (productId: string) => void;
   selectedTab: PageTabValues;
 }
 
+/**
+ * 적금 계산기 탭 컨텐츠
+ *
+ * 책임: 탭별 컨텐츠 렌더링
+ * - 상품 목록 탭: 필터링된 적금 상품 목록 표시
+ * - 계산 결과 탭: 선택한 상품의 계산 결과 + 추천 상품 표시
+ * - 선택된 상품 상태 관리 (두 탭 간 공유)
+ */
 export default function SavingsCalculatorContent({
   targetAmount,
   monthlyAmount,
   savingsTerms,
-  selectedProductId,
-  setSelectedProductId,
   selectedTab,
 }: SavingsCalculatorContentProps) {
+  // 선택된 상품 ID - Content 내부에서만 사용하므로 여기서 관리
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
   const { products: savingsProducts, loading, error } = useSavingsProducts();
   const displayedProducts = useFilteredProducts(savingsProducts, monthlyAmount, savingsTerms);
 

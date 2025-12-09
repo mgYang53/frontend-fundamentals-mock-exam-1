@@ -1,16 +1,29 @@
 import { useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { SavingsCalculatorContent } from './components';
-import { extractDigits, formatAmount } from './utils';
-import type { PageTabValues } from './types';
 
+export type PageTabValues = 'products' | 'results';
+
+/**
+ * 적금 계산기 메인 페이지
+ *
+ * 책임: 전체 페이지 레이아웃 및 상태 조율
+ * - 입력 필드 섹션
+ * - 탭 네비게이션
+ * - 탭 컨텐츠 (상품 목록 / 계산 결과)
+ */
 export default function SavingsCalculatorPage() {
+  // 입력 상태
   const [targetAmount, setTargetAmount] = useState<string>('');
   const [monthlyAmount, setMonthlyAmount] = useState<string>('');
   const [savingsTerms, setSavingsTerms] = useState<number>(6);
 
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  // 탭 상태
   const [selectedTab, setSelectedTab] = useState<PageTabValues>('products');
+
+  // 아래 두 함수 필요 시 추후 유틸로 분리
+  const extractDigits = (str: string) => str.replace(/\D/g, '');
+  const formatAmount = (raw: string) => (raw ? Number(raw).toLocaleString() : '');
 
   return (
     <>
@@ -18,6 +31,7 @@ export default function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
+      {/* 입력 필드 섹션 */}
       <TextField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
@@ -49,6 +63,7 @@ export default function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
+      {/* 탭 네비게이션 */}
       <Tab onChange={value => setSelectedTab(value as PageTabValues)}>
         <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
@@ -58,12 +73,11 @@ export default function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
+      {/* 탭 컨텐츠 */}
       <SavingsCalculatorContent
         targetAmount={targetAmount}
         monthlyAmount={monthlyAmount}
         savingsTerms={savingsTerms}
-        selectedProductId={selectedProductId}
-        setSelectedProductId={setSelectedProductId}
         selectedTab={selectedTab}
       />
     </>
