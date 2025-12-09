@@ -1,11 +1,11 @@
-export interface CalculationParams {
+interface CalculationParams {
   monthlyAmount: number;
   savingsTerms: number;
   annualRate: number;
   targetAmount: number;
 }
 
-export interface CalculationResults {
+interface CalculationResults {
   expectedProfit: number;
   diffFromTargetAmount: number;
   recommendedMonthlyAmount: number;
@@ -26,8 +26,8 @@ export const calculateSavingsResults = ({
   const recommendedMonthlyAmount = savingsTerms > 0 ? targetAmount / (savingsTerms * rateMultiplier) : 0;
 
   return {
-    expectedProfit: Number.isFinite(expectedProfit) ? expectedProfit : 0,
-    diffFromTargetAmount: Number.isFinite(diffFromTargetAmount) ? diffFromTargetAmount : 0,
-    recommendedMonthlyAmount: Number.isFinite(recommendedMonthlyAmount) ? recommendedMonthlyAmount : 0,
+    expectedProfit,
+    diffFromTargetAmount,
+    recommendedMonthlyAmount: Math.round(recommendedMonthlyAmount / 1000) * 1000, // 1,000 단위 반올림
   };
 };
