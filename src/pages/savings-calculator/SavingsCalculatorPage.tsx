@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from 'shared/components';
 import { SavingsCalculatorContent } from './components';
 
 export type PageTabValues = 'products' | 'results';
@@ -73,13 +75,17 @@ export default function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {/* 탭 컨텐츠 */}
-      <SavingsCalculatorContent
-        targetAmount={targetAmount}
-        monthlyAmount={monthlyAmount}
-        savingsTerms={savingsTerms}
-        selectedTab={selectedTab}
-      />
+      {/* 탭 컨텐츠 - Suspense와 Error Boundary로 로딩/에러 처리 */}
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<div css={{ padding: '16px', textAlign: 'center' }}>로딩 중...</div>}>
+          <SavingsCalculatorContent
+            targetAmount={targetAmount}
+            monthlyAmount={monthlyAmount}
+            savingsTerms={savingsTerms}
+            selectedTab={selectedTab}
+          />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }
