@@ -1,48 +1,18 @@
-import { useEffect, useState } from 'react';
-import { http, isHttpError } from 'tosslib';
+import { useMemo } from 'react';
+
+import { createSuspenseResource } from 'shared/utils';
+import { fetchSavingsProducts } from '../api';
 import type { SavingsProduct } from '../types';
 
-interface UseSavingsProductsReturn {
-  products: SavingsProduct[];
-  loading: boolean;
-  error: string | null;
-}
+/**
+ * Suspense 기반 적금 상품 조회 훅
+ *
+ * - 로딩 상태는 Suspense fallback에서 처리
+ * - 에러는 Error Boundary에서 처리
+ * - 성공 케이스만 반환하여 컴포넌트가 정상 흐름에 집중할 수 있도록 함
+ */
+export const useSavingsProducts = (): SavingsProduct[] => {
+  const resource = useMemo(() => createSuspenseResource(fetchSavingsProducts()), []);
 
-export const useSavingsProducts = (): UseSavingsProductsReturn => {
-  const [products, setProducts] = useState<SavingsProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await http.get<SavingsProduct[]>('/api/savings-products');
-        if (!cancelled) {
-          setProducts(data);
-          setError(null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          if (isHttpError(err)) {
-            setError(`적금 상품을 불러올 수 없습니다: ${err.message}`);
-          } else {
-            setError('알 수 없는 오류가 발생했습니다.');
-          }
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return { products, loading, error };
+  return resource.read();
 };
