@@ -1,25 +1,47 @@
 import { colors, ListRow } from 'tosslib';
+import { useSavingsProducts } from '../hooks';
 import { calculateSavingsResults } from '../utils';
+import type { SavingsTerms } from '../types';
 
 interface CalculationResultProps {
-  annualRate: number;
-  targetAmount: number;
-  monthlyAmount: number;
-  savingsTerms: number;
+  selectedProductId: string | null;
+  targetAmount: string;
+  monthlyAmount: string;
+  savingsTerms: SavingsTerms;
 }
 
+/**
+ * 계산 결과 컴포넌트
+ *
+ * 제어의 역전(IoC) 패턴 적용:
+ * - 데이터 페칭은 내부에서 처리 (useSavingsProducts)
+ * - selectedProductId로 선택된 상품 찾기
+ * - 선택된 상품이 없으면 빈 상태 표시
+ */
 export default function CalculationResult({
-  annualRate,
+  selectedProductId,
   targetAmount,
   monthlyAmount,
   savingsTerms,
 }: CalculationResultProps) {
+  // 데이터는 내부에서 fetch (Suspense throw)
+  const allProducts = useSavingsProducts();
+
+  // selectedProductId로 선택된 상품 찾기
+  const selectedProduct = allProducts.find(p => p.id === selectedProductId);
+
+  // 선택된 상품이 없으면 빈 상태 표시
+  if (!selectedProduct) {
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
+  }
+
   const { expectedProfit, diffFromTargetAmount, recommendedMonthlyAmount } = calculateSavingsResults({
-    monthlyAmount,
+    monthlyAmount: Number(monthlyAmount),
     savingsTerms,
-    annualRate,
-    targetAmount,
+    annualRate: selectedProduct.annualRate,
+    targetAmount: Number(targetAmount),
   });
+
   return (
     <>
       <ListRow

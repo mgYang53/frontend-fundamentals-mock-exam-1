@@ -1,21 +1,55 @@
 import { Assets, colors, ListRow } from 'tosslib';
+import { useSavingsProducts } from '../hooks';
 import type { SavingsProduct } from '../types';
 
 interface SavingsProductsListProps {
-  savingsProducts: SavingsProduct[];
+  filterFns?: Array<(product: SavingsProduct) => boolean>;
+  sortFn?: (a: SavingsProduct, b: SavingsProduct) => number;
+  limit?: number;
   selectedProductId: string | null;
   onClickProduct?: (product: SavingsProduct) => void;
 }
 
+/**
+ * 적금 상품 목록 컴포넌트
+ *
+ * 제어의 역전(IoC) 패턴 적용:
+ * - 데이터 페칭은 내부에서 처리 (useSavingsProducts)
+ * - 필터/정렬/제한 로직은 외부에서 주입
+ * - Suspense 경계를 개별적으로 적용 가능
+ */
 export default function SavingsProductsList({
-  savingsProducts,
+  filterFns,
+  sortFn,
+  limit,
   selectedProductId,
   onClickProduct,
 }: SavingsProductsListProps) {
+  // 데이터는 내부에서 fetch (Suspense throw)
+  const allProducts = useSavingsProducts();
+
+  // 필터링, 정렬, 제한을 외부 함수에 따라 처리
+  let products = allProducts;
+
+  // 필터링: 모든 필터 함수를 순차적으로 적용
+  if (filterFns && filterFns.length > 0) {
+    products = products.filter(product => filterFns.every(fn => fn(product)));
+  }
+
+  // 정렬
+  if (sortFn) {
+    products = [...products].sort(sortFn);
+  }
+
+  // 개수 제한
+  if (limit) {
+    products = products.slice(0, limit);
+  }
+
   return (
     <>
-      {savingsProducts.length > 0 ? (
-        savingsProducts.map(product => (
+      {products.length > 0 ? (
+        products.map(product => (
           <ListRow
             key={product.id}
             contents={
